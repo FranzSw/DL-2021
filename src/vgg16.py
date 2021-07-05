@@ -6,37 +6,6 @@ from keras.models import Model
 from keras.applications.vgg16 import VGG16
 from scipy.optimize import fmin_l_bfgs_b
 
-width = 512
-height = 512
-
-
-def setup():
-    tf.compat.v1.disable_eager_execution()
-    pass
-
-
-def preprocess_image(img):
-    img = img.resize((width, height))
-    img = np.asarray(img)
-    img = np.asarray(img, dtype='float32')
-    img = np.expand_dims(img, axis=0)
-    img[:, :, :, 0] -= 103.939
-    img[:, :, :, 1] -= 116.779
-    img[:, :, :, 2] -= 123.68
-    img = img[:, :, :, ::-1]
-    return img
-
-
-def postprocess_output_image(img):
-    img = img.reshape((height, width, 3))
-    img = img[:, :, ::-1]
-    img[:, :, 0] += 103.939
-    img[:, :, 1] += 116.779
-    img[:, :, 2] += 123.68
-    img = np.clip(img, 0, 255).astype('uint8')
-    img = Image.fromarray(img)
-    return img
-
 
 def _content_loss(content, combination):
     return backend.sum(backend.square(combination - content))
@@ -52,17 +21,49 @@ def _style_loss(style, combination):
     S = gram_matrix(style)
     C = gram_matrix(combination)
     channels = 3
-    size = height * width
+    size = Evaluator.height * Evaluator.height
     return backend.sum(backend.square(S - C)) / (4. * (channels ** 2) * (size ** 2))
 
 
 def _total_variation_loss(x):
-    a = backend.square(x[:, :height-1, :width-1, :] - x[:, 1:, :width-1, :])
-    b = backend.square(x[:, :height-1, :width-1, :] - x[:, :height-1, 1:, :])
+    a = backend.square(x[:, :Evaluator.height-1, :Evaluator.width -
+                       1, :] - x[:, 1:, :Evaluator.width-1, :])
+    b = backend.square(x[:, :Evaluator.height-1, :Evaluator.width -
+                       1, :] - x[:, :Evaluator.height-1, 1:, :])
     return backend.sum(backend.pow(a + b, 1.25))
 
 
 class Evaluator(object):
+
+    width = 512
+    height = 512
+
+    @classmethod
+    def setup(_cls):
+        tf.compat.v1.disable_eager_execution()
+
+    @classmethod
+    def preprocess_image(cls, img):
+        img = img.resize((cls.width, cls.height))
+        img = np.asarray(img)
+        img = np.asarray(img, dtype='float32')
+        img = np.expand_dims(img, axis=0)
+        img[:, :, :, 0] -= 103.939
+        img[:, :, :, 1] -= 116.779
+        img[:, :, :, 2] -= 123.68
+        img = img[:, :, :, ::-1]
+        return img
+
+    @classmethod
+    def postprocess_image(cls, img):
+        img = img.reshape((cls.height, cls.width, 3))
+        img = img[:, :, ::-1]
+        img[:, :, 0] += 103.939
+        img[:, :, 1] += 116.779
+        img[:, :, 2] += 123.68
+        img = np.clip(img, 0, 255).astype('uint8')
+        img = Image.fromarray(img)
+        return img
 
     def __init__(self, content, style, content_weight, style_weight, total_variation_weight):
         self.loss_value = None
@@ -72,7 +73,8 @@ class Evaluator(object):
         self.total_variation_weight = total_variation_weight
         content_image = backend.variable(content)
         style_image = backend.variable(style)
-        self.combination_image = backend.placeholder((1, height, width, 3))
+        self.combination_image = backend.placeholder(
+            (1, Evaluator.height, Evaluator.width, 3))
         self.input_tensor = backend.concatenate([content_image,
                                                  style_image,
                                                  self.combination_image], axis=0)
@@ -89,7 +91,8 @@ class Evaluator(object):
         outputs += grads
         self.f_outputs = backend.function(
             [self.combination_image], outputs)
-        self.x = np.random.uniform(0, 255, (1, height, width, 3)) - 128
+        self.x = np.random.uniform(
+            0, 255, (1, Evaluator.height, Evaluator.width, 3)) - 128
 
     def eval_and_train(self):
         self.x, _min_val, _info = fmin_l_bfgs_b(self.eval_loss, self.x.flatten(),
@@ -121,7 +124,7 @@ class Evaluator(object):
         return self.total_variation_weight * _total_variation_loss(self.combination_image)
 
     def eval_loss_and_grads(self, x):
-        x = x.reshape((1, height, width, 3))
+        x = x.reshape((1, Evaluator.height, Evaluator.width, 3))
         outs = self.f_outputs([x])
         loss_value = outs[0]
         grad_values = outs[1].flatten().astype('float64')

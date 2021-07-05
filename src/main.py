@@ -10,10 +10,12 @@ import itertools
 
 
 models = ['vgg16']
-content_weights = [0.2]
-style_weights = [5.0]
-total_variation_weights = [2.0]
-num_iterations = [10]  # range(1, 11)
+content_weights = [0.025, 0.08, 0.15]
+style_weights = [2.0, 5.0, 12.0]
+total_variation_weights = [1.0, 3.0, 10.0]
+num_iterations = [10]
+# num_iterations = range(1, 11)
+# num_iterations = range(1, 11, 2)
 
 out_folder = 'out'
 content_folder = 'in/content/*'
@@ -29,7 +31,7 @@ def calculate(mod, content, style, content_weight, style_weight, total_variation
         print('Start of iteration', i)
         x = evaluator.eval_and_train()
         if i in num_iterations:
-            mod.postprocess_output_image(x).save(
+            mod.Evaluator.postprocess_image(x).save(
                 path.join(out_folder, f'{out_base}_{i}.png'))
     print()
 
@@ -37,10 +39,10 @@ def calculate(mod, content, style, content_weight, style_weight, total_variation
 def process(content_image, style_image, out):
     for model in models:
         mod = importlib.import_module(model)
-        mod.setup()
+        mod.Evaluator.setup()
         for (content_weight, style_weight, total_variation_weight) in itertools.product(content_weights, style_weights, total_variation_weights):
-            content = mod.preprocess_image(content_image)
-            style = mod.preprocess_image(style_image)
+            content = mod.Evaluator.preprocess_image(content_image)
+            style = mod.Evaluator.preprocess_image(style_image)
             out_base = f'{model}_{content_weight}_{style_weight}_{total_variation_weight}'
             out_base = path.join(out, out_base)
             if overwrite or not all([path.exists(path.join(out_folder, f'{out_base}_{i}.png'))
