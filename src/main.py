@@ -17,9 +17,10 @@ num_iterations = [10]
 # num_iterations = range(1, 11)
 # num_iterations = range(1, 11, 2)
 
-out_folder = 'out'
-content_folder = 'in/content/*'
-style_folder = 'in/style/*'
+folder, _ = os.path.split(os.path.realpath(__file__))
+out_folder = path.join(folder, 'out')
+content_folder = path.join(folder, 'in/content/*')
+style_folder = path.join(folder, 'in/style/*')
 overwrite = False
 
 
