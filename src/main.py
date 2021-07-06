@@ -52,10 +52,19 @@ def process(content_image, style_image, out):
                           style_weight, total_variation_weight, out_base)
 
 
+def load_image_rgb(file):
+    img = Image.open(file)
+    if img.mode != 'RGB':
+        rgbimg = Image.new('RGB', img.size)
+        rgbimg.paste(img)
+        img = rgbimg
+    return img
+
+
 for content_file in glob(content_folder):
-    content_image = Image.open(content_file)
+    content_image = load_image_rgb(content_file)
     for style_file in glob(style_folder):
-        style_image = Image.open(style_file)
+        style_image = load_image_rgb(style_file)
         out = f'{path.basename(content_file)}_{path.basename(style_file)}'
         out_dir = path.join(out_folder, out)
         if not path.exists(out_dir):
