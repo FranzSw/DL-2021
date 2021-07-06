@@ -32,7 +32,8 @@ def calculate(mod, content, style, content_weight, style_weight, total_variation
         print('Start of iteration', i)
         x = evaluator.eval_and_train()
         if i in num_iterations:
-            mod.Evaluator.postprocess_image(x).save(
+            img = x.copy()
+            mod.Evaluator.postprocess_image(img).save(
                 path.join(out_folder, f'{out_base}_{i}.png'))
     print()
 
