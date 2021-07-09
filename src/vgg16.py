@@ -65,14 +65,14 @@ class Evaluator(object):
         img = Image.fromarray(img)
         return img
 
-    def __init__(self, content, style, content_weight, style_weight, total_variation_weight):
+    def __init__(self, config):
         self.loss_value = None
         self.grads_values = None
-        self.content_weight = content_weight
-        self.style_weight = style_weight
-        self.total_variation_weight = total_variation_weight
-        content_image = backend.variable(content)
-        style_image = backend.variable(style)
+        self.content_weight = config.content_weight
+        self.style_weight = config.style_weight
+        self.total_variation_weight = config.total_variation_weight
+        content_image = backend.variable(config.content)
+        style_image = backend.variable(config.style)
         self.combination_image = backend.placeholder(
             (1, Evaluator.height, Evaluator.width, 3))
         self.input_tensor = backend.concatenate([content_image,
