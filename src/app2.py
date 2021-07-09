@@ -16,14 +16,12 @@ class yoloUI:
         self.styleImageFilePath = ''
         self.cap = cv2.VideoCapture(0)
         self.root = Tk()
-        #self.config = Config('vgg16')
+        self.config = Config('vgg16')
 
         self.initializeRoot()
         self.initializeVideoCap()
         self.buildContentSelection()
-        #self.buildNetworkSelection()
-
-        #startStyleTransferButton = Button(self.root, text='Start Style Transfer', command= self.letsGo)
+        self.buildNetworkSelection()
 
         self.buildButtonsWithStyleImages()
 
@@ -57,7 +55,7 @@ class yoloUI:
 
     def buildNetworkSelection(self):
         fNetworkSelection = Frame(self.root)
-        fNetworkSelection.grid(column=2)
+        fNetworkSelection.grid(column=2, row = 1)
         variable = StringVar(fNetworkSelection)
         variable.set("one")
         w = OptionMenu(fNetworkSelection, variable, "Resnet", "VGG")
@@ -69,7 +67,10 @@ class yoloUI:
         contentWeightEntry.grid()
         styleWeightEntry.grid()
         tvWeightEntry.grid()
-        # saturationEntry = Entry(self.root, textvariable = self.config)
+        saturationEntry = Entry(self.root, textvariable = self.config)
+        startStyleTransferButton = Button(fNetworkSelection, text='Start Style Transfer', command= self.letsGo)
+        startStyleTransferButton.grid()
+
 
     def buildContentSelection(self):
 
@@ -120,13 +121,14 @@ class yoloUI:
         self.updateContentImage('ContentIn.png')
 
     def letsGo(self):
-        transfered_image = calculate(self.config, self.displayIntermediateResults())
+        transfered_image = calculate(self.config, lambda x,y:0)
         Image.imshow(transfered_image)
 
     def updateContentImage(self, newPath):
         self.contentImageFilePath = newPath
         self.cContent.delete("all")
         self.contentImage = Image.open(self.contentImageFilePath)
+        self.config.set_content(self.contentImage)
         self.contentImage = self.contentImage.resize((640,360))
         self.contentImage = ImageTk.PhotoImage(self.contentImage)
 
@@ -135,7 +137,7 @@ class yoloUI:
     def updateStyleImage(self, newPath):
         self.styleImageFilePath = newPath
         self.styleImage = Image.open(self.styleImageFilePath)
-    
+        self.config.set_style(self.styleImage)
 
 def main():
     gui = yoloUI()
