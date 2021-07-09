@@ -25,7 +25,10 @@ class yoloUI:
 
         self.buildButtonsWithStyleImages()
 
-        self.show_frame()
+        if not self.cap.isOpened():
+            print("No Webcam Input detected")
+        else:
+            self.show_frame()
         self.root.mainloop()
 
     def buildButtonsWithStyleImages(self):
@@ -46,8 +49,10 @@ class yoloUI:
         styleButtons.append(bSelectOwnStyle)
 
         # place buttons in list on canvas
+        i = 0
         for button in styleButtons:
-            button.grid()
+            button.grid(row=int((i/2)+1), column=int((i%2)+1))
+            i+=1
 
     def initializeVideoCap(self):
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
@@ -61,9 +66,9 @@ class yoloUI:
         w = OptionMenu(fNetworkSelection, variable, "Resnet", "VGG")
         w.grid()
 
-        contentWeightEntry = Entry(fNetworkSelection)#, textvariable = self.config.content_weight)
-        styleWeightEntry = Entry(fNetworkSelection)#, textvariable = self.config.style_weight)
-        tvWeightEntry = Entry(fNetworkSelection)#, textvariable = self.config.total_variation_weight)
+        contentWeightEntry = Entry(fNetworkSelection, textvariable=self.config.content_weight)
+        styleWeightEntry = Entry(fNetworkSelection, textvariable = self.config.style_weight)
+        tvWeightEntry = Entry(fNetworkSelection, textvariable = self.config.total_variation_weight)
         contentWeightEntry.grid()
         styleWeightEntry.grid()
         tvWeightEntry.grid()
@@ -75,15 +80,18 @@ class yoloUI:
     def buildContentSelection(self):
 
         ## Frames on left side containing Webcam, Buttons, SelectedImage
-        fContent = Frame(self.root)
+        fLeft = Frame(self.root)
+        fLeft.grid(row=1, column=1)
+        fContent = Frame(fLeft, width=640, height=360, bg='lightgray')
+        fContent.grid_propagate(0)
         fContent.grid(row = 1, padx = 10, pady = 10)
-        fContentButtons = Frame(self.root)
+        fContentButtons = Frame(fLeft)
         fContentButtons.grid(row=2, pady = 10)
-        fContentImage = Frame(self.root)
+        fContentImage = Frame(fLeft, pady=10, padx=10)
         fContentImage.grid(row=3)
 
-        self.lmainVideo = Label(fContent)
-        self.lmainVideo.pack(side = LEFT)
+        self.lmainVideo = Label(fContent, bg='lightgray')
+        self.lmainVideo.grid(row= 1,column = 1)
 
         bTakePhoto = Button(fContentButtons, text = "Take Photo", command=self.takePhoto)
         bSelectPhoto = Button(fContentButtons, text = "Select Image", command=self.getLocalFile)
@@ -95,7 +103,7 @@ class yoloUI:
 
     def initializeRoot(self):
         self.root.title('YOLO - Style Transfer')
-        self.root.bind('<Escape>', lambda e: root.quit())
+        self.root.bind('<Escape>', lambda e: self.root.quit())
 
     def getLocalFile(self, getContent=True):
         filePath = filedialog.askopenfilename()
@@ -121,8 +129,12 @@ class yoloUI:
         self.updateContentImage('ContentIn.png')
 
     def letsGo(self):
+        print(self.config.content_weight)
+        print(self.config.style_weight)
+        print(self.config.total_variation_weight)
+        print(self.config)
         transfered_image = calculate(self.config, lambda x,y:0)
-        Image.imshow(transfered_image)
+        transfered_image.show()
 
     def updateContentImage(self, newPath):
         self.contentImageFilePath = newPath
