@@ -21,7 +21,7 @@ def _style_loss(style, combination):
     S = gram_matrix(style)
     C = gram_matrix(combination)
     channels = 3
-    size = Evaluator.height * Evaluator.height
+    size = Evaluator.height * Evaluator.width
     return backend.sum(backend.square(S - C)) / (4. * (channels ** 2) * (size ** 2))
 
 
