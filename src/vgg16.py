@@ -4,7 +4,7 @@ import tensorflow as tf
 from keras import backend
 from keras.models import Model
 from keras.applications.vgg16 import VGG16
-from scipy.optimize import fmin_l_bfgs_b
+from scipy.optimize import minimize
 
 
 def _content_loss(content, combination):
@@ -95,8 +95,9 @@ class Evaluator(object):
             0, 255, (1, Evaluator.height, Evaluator.width, 3)) - 128
 
     def eval_and_train(self):
-        self.x, _min_val, _info = fmin_l_bfgs_b(self.eval_loss, self.x.flatten(),
-                                                fprime=self.eval_grads, maxfun=20)
+        res = minimize(self.eval_loss, self.x.flatten(),
+                       method='L-BFGS-B', jac=self.eval_grads, options={'maxiter': 20})
+        self.x = res.x
         return self.x
 
     def content_loss(self):
