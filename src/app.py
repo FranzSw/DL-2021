@@ -41,8 +41,10 @@ class yoloUI:
             with Image.open(filepath) as img:
                 img = img.resize((128,128))
                 img = ImageTk.PhotoImage(img)
-                styleButton = Button(style_buttons_frame, text=filename, image=img, width=128, height=128, command= lambda : self.updateStyleImage(filepath))
+                styleButton = Button(style_buttons_frame, text=filename, image=img, width=128, height=128)
                 styleButton.image = img
+                styleButton.filepath = filepath
+                styleButton.bind("<Button-1>", lambda e: self.updateStyleImage(e.widget.filepath))
                 style_buttons.append(styleButton)
 
         bSelectOwnStyle = Button(style_buttons_frame, text ="Select Own Style", command=lambda : self.getLocalFile(getContent=False))
