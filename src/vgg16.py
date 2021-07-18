@@ -34,7 +34,6 @@ def _total_variation_loss(x):
 
 
 class Evaluator(object):
-
     width = 512
     height = 512
 
@@ -66,11 +65,14 @@ class Evaluator(object):
         return img
 
     def __init__(self, config):
+        # Copy necessary configuration
         self.loss_value = None
         self.grads_values = None
         self.content_weight = config.content_weight
         self.style_weight = config.style_weight
         self.total_variation_weight = config.total_variation_weight
+
+        # Prepare variables for computation graph
         content_image = backend.variable(config.content)
         style_image = backend.variable(config.style)
         self.combination_image = backend.placeholder(
@@ -78,10 +80,14 @@ class Evaluator(object):
         self.input_tensor = backend.concatenate([content_image,
                                                  style_image,
                                                  self.combination_image], axis=0)
+
+        # Setup classifier model
         self.model = VGG16(input_tensor=self.input_tensor, weights='imagenet',
                            include_top=False)
         self.layers = dict([(layer.name, layer.output)
                            for layer in self.model.layers])
+
+        # Define loss computation graph
         loss = backend.variable(0)\
             + self.content_loss()\
             + self.style_loss()\
