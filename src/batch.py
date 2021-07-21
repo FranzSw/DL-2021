@@ -26,7 +26,7 @@ def process(content_image, style_image, out):
             config.num_iterations = max(num_iterations)
             out_base = f'{model}_{content_weight}_{style_weight}_{total_variation_weight}'
             out_base = path.join(out, out_base)
-            if overwrite or not all([path.exists(path.join(out_folder, f'{out_base}_{i}_{output_saturation}.png'))
+            if overwrite or not all([path.exists(path.join(out_folder, f'{out_base}_{i}.png'))
                                      for i, output_saturation in itertools.product(num_iterations, output_saturations)]):
                 print(out_base)
                 res = calculate(config, lambda img, i: img.save(
