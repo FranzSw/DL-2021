@@ -1,4 +1,4 @@
-from keras.applications.vgg16 import VGG16
+from keras.applications.vgg19 import VGG19
 from ..helpers import *
 from ..evaluator import Evaluator as BaseEvaluator
 
@@ -19,5 +19,5 @@ class Evaluator(BaseEvaluator):
         return postprocess_image_imagenet(img, cls.dimensions)
 
     def setup_model(self):
-        self.model = VGG16(input_tensor=self.input_tensor, weights='imagenet',
+        self.model = VGG19(input_tensor=self.input_tensor, weights='imagenet',
                            include_top=False)
