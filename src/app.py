@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import filedialog
-from config import Config
-from calculation import calculate
+from lib.config import Config
+from lib.calculation import calculate
 import cv2
 import os
 from PIL import Image, ImageTk

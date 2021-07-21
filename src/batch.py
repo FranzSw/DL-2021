@@ -8,10 +8,10 @@ import numpy as np
 import itertools
 
 
-from config import Config
+from lib.config import Config
 from parameters import *
-from calculation import calculate
-from utils import load_image_rgb
+from lib.calculation import calculate
+from lib.utils import load_image_rgb
 
 
 def process(content_image, style_image, out):
