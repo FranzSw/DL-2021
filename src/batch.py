@@ -2,6 +2,7 @@
 from PIL import Image, ImageEnhance
 from glob import glob
 from os import path
+import os
 from scipy.optimize import fmin_l_bfgs_b
 import numpy as np
 import itertools
