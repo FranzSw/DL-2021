@@ -34,9 +34,12 @@ class yoloUI:
         self.root.mainloop()
 
     def build_style_selection(self):
+
+        rFrame = Frame(self.root)
+        rFrame.grid(column=3, row=1, sticky=N)
         # buttons for styles
-        style_buttons_frame = Frame(self.root)
-        style_buttons_frame.grid(column=3, row=1)
+        style_buttons_frame = Frame(rFrame)
+        style_buttons_frame.grid(column=1, row=1)
         style_buttons = []
         for filename in os.listdir(self.style_images_path):
             filepath = os.path.join(self.style_images_path, filename)
@@ -51,15 +54,27 @@ class yoloUI:
                     "<Button-1>", lambda e: self.updateStyleImage(e.widget.filepath))
                 style_buttons.append(styleButton)
 
-        bSelectOwnStyle = Button(style_buttons_frame, text="Select Own Style",
-                                 command=lambda: self.getLocalFile(getContent=False))
-        style_buttons.append(bSelectOwnStyle)
-
         # place buttons in list on canvas
         i = 0
         for button in style_buttons:
-            button.grid(row=int((i/2)+1), column=int((i % 2)+1))
+            button.grid(row=int((i % 2)+1), column=int((i/2)+1))
             i += 1
+
+        self.build_select_custom_style(rFrame)
+        self.build_style_image_canvas(rFrame)
+
+
+    def build_style_image_canvas(self, frame):
+        self.cStyle = Canvas(frame,
+                               width=500, height=500, bg='lightgray')
+        self.cStyle.grid(row=3, column=1)
+
+
+    def build_select_custom_style(self, frame):
+        bSelectOwnStyle = Button(frame, text="Select Own Style",
+                                 command=lambda: self.getLocalFile(getContent=False))
+        bSelectOwnStyle.grid(column=1, row=2)
+
 
     def initializeVideoCap(self):
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
@@ -169,6 +184,10 @@ class yoloUI:
         self.style_image_path = newPath
         self.style_image = Image.open(self.style_image_path)
         self.config.set_style(self.style_image)
+        self.style_image = self.style_image.resize((500,500))
+        self.style_image = ImageTk.PhotoImage(self.style_image)
+
+        self.cStyle.create_image(0, 0, anchor=NW, image=self.style_image)
 
 
 def main():
