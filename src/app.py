@@ -17,7 +17,7 @@ class yoloUI:
         self.style_image_path = ''
         self.cap = cv2.VideoCapture(0)
         self.root = Tk()
-        self.selected_model = ""
+        self.selected_model = "vgg16"
         self.config = Config('vgg16')
 
         self.initializeRoot()
@@ -174,8 +174,8 @@ class yoloUI:
         self.config.total_variation_weight = float(self.tv_weight_entry.get())
 
     def start_style_transfer(self):
-        config = self.create_config()
-        transfered_image = calculate(config, lambda x, y: 0)
+        self.create_config()
+        transfered_image = calculate(self.config, lambda x, y: 0)
         transfered_image.show()
 
     def updateContentImage(self, newPath):
