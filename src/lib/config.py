@@ -5,7 +5,7 @@ from os import path
 class Config(object):
 
     def __init__(self, model):
-        self.mod = importlib.import_module(f'lib.models.{model}')
+        self.mod = importlib.import_module(model)
         self.mod.Evaluator.setup()
         self.content_weight = 0.025
         self.style_weight = 12.0

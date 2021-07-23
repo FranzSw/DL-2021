@@ -2,3 +2,5 @@ out
 in
 src/**/__pycache__
 src/parameters.py
+.ipynb_checkpoints
+

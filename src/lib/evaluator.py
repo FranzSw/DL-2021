@@ -3,7 +3,7 @@ from PIL import Image
 import tensorflow as tf
 from keras import backend
 from scipy.optimize import minimize
-from lib.helpers import *
+from .helpers import *
 
 
 class Evaluator(object):
