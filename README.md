@@ -8,4 +8,4 @@
 
 # Notebook Demo
 
-1. Open `Demo.ipynb`.
+1. Open `Demo.ipynb`, `Demo_module.ipynb` or `Demo_module_advanced.ipynb`.
