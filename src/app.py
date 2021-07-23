@@ -6,7 +6,6 @@ import cv2
 import os
 from PIL import Image, ImageTk
 
-
 class yoloUI:
     def __init__(self):
         self.content_image = None
@@ -18,7 +17,8 @@ class yoloUI:
         self.style_image_path = ''
         self.cap = cv2.VideoCapture(0)
         self.root = Tk()
-        self.config = Config('vgg16')
+        self.selected_model = ""
+        self.config = None
 
         self.initializeRoot()
         self.initializeVideoCap()
@@ -80,13 +80,17 @@ class yoloUI:
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 360)
 
+    def change_model_selection(self, new_model):
+        print(new_model)
+        self.selected_model = new_model
+
     def build_network_selection(self):
         network_selection_frame = Frame(self.root)
         network_selection_frame.grid(column=2, row=1)
         variable = StringVar(network_selection_frame)
-        variable.set("one")
+        variable.set("VGG-16")
 
-        w = OptionMenu(network_selection_frame, variable, "Resnet", "VGG")
+        w = OptionMenu(network_selection_frame, variable, "vgg16", "vgg19", command=self.change_model_selection)
         w.grid()
 
         self.content_weight_entry = Entry(network_selection_frame)
@@ -160,33 +164,33 @@ class yoloUI:
         cv2.imwrite('ContentIn.png', frame)
         self.updateContentImage('ContentIn.png')
 
-    def start_style_transfer(self):
-        print(self.content_weight_entry.get(),
-              self.style_weight_entry.get(), self.tv_weight_entry.get())
+    def create_config(self):
+        print(str(self.selected_model))
+        self.config = Config(str(self.selected_model))
+        self.config.set_content(Image.open(self.content_image_path))
+        self.config.set_style(Image.open(self.style_image_path))
         self.config.content_weight = float(self.content_weight_entry.get())
         self.config.style_weight = float(self.style_weight_entry.get())
         self.config.total_variation_weight = float(self.tv_weight_entry.get())
 
-        transfered_image = calculate(self.config, lambda x, y: 0)
+    def start_style_transfer(self):
+        config = self.create_config()
+        transfered_image = calculate(config, lambda x, y: 0)
         transfered_image.show()
 
     def updateContentImage(self, newPath):
         self.content_image_path = newPath
         self.cContent.delete("all")
         self.content_image = Image.open(self.content_image_path)
-        self.config.set_content(self.content_image)
         self.content_image = self.content_image.resize((640, 360))
         self.content_image = ImageTk.PhotoImage(self.content_image)
-
         self.cContent.create_image(0, 0, anchor=NW, image=self.content_image)
 
     def updateStyleImage(self, newPath):
         self.style_image_path = newPath
         self.style_image = Image.open(self.style_image_path)
-        self.config.set_style(self.style_image)
         self.style_image = self.style_image.resize((500,500))
         self.style_image = ImageTk.PhotoImage(self.style_image)
-
         self.cStyle.create_image(0, 0, anchor=NW, image=self.style_image)
 
 
