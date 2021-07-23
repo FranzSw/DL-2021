@@ -25,7 +25,7 @@ class Evaluator(object):
 
     def __init__(self, config):
         self.loss_value = None
-        self.grads_values = None
+        self.grad_values = None
         self.content_weight = config.content_weight
         self.style_weight = config.style_weight
         self.total_variation_weight = config.total_variation_weight
@@ -109,15 +109,8 @@ class Evaluator(object):
         return loss_value, grad_values
 
     def eval_loss(self, x):
-        assert self.loss_value is None
-        loss_value, grad_values = self.eval_loss_and_grads(x)
-        self.loss_value = loss_value
-        self.grad_values = grad_values
+        self.loss_value, self.grad_values = self.eval_loss_and_grads(x)
         return self.loss_value
 
     def eval_grads(self, _x):
-        assert self.loss_value is not None
-        grad_values = np.copy(self.grad_values)
-        self.loss_value = None
-        self.grad_values = None
-        return grad_values
+        return np.copy(self.grad_values)
