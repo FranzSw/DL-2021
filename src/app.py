@@ -6,6 +6,7 @@ import cv2
 import os
 from PIL import Image, ImageTk
 
+
 class yoloUI:
     def __init__(self):
         self.content_image = None
@@ -18,7 +19,7 @@ class yoloUI:
         self.cap = cv2.VideoCapture(0)
         self.root = Tk()
         self.selected_model = "vgg16"
-        self.config = Config('vgg16')
+        self.config = Config('lib.models.vgg16')
 
         self.initializeRoot()
         self.initializeVideoCap()
@@ -63,18 +64,15 @@ class yoloUI:
         self.build_select_custom_style(rFrame)
         self.build_style_image_canvas(rFrame)
 
-
     def build_style_image_canvas(self, frame):
         self.cStyle = Canvas(frame,
-                               width=500, height=500, bg='lightgray')
+                             width=500, height=500, bg='lightgray')
         self.cStyle.grid(row=3, column=1)
-
 
     def build_select_custom_style(self, frame):
         bSelectOwnStyle = Button(frame, text="Select Own Style",
                                  command=lambda: self.getLocalFile(getContent=False))
         bSelectOwnStyle.grid(column=1, row=2)
-
 
     def initializeVideoCap(self):
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
@@ -90,7 +88,8 @@ class yoloUI:
         variable = StringVar(network_selection_frame)
         variable.set("VGG-16")
 
-        w = OptionMenu(network_selection_frame, variable, "vgg16", "vgg19", command=self.change_model_selection)
+        w = OptionMenu(network_selection_frame, variable, "vgg16",
+                       "vgg19", command=self.change_model_selection)
         w.grid()
 
         self.content_weight_entry = Entry(network_selection_frame)
@@ -166,7 +165,7 @@ class yoloUI:
 
     def create_config(self):
         print(str(self.selected_model))
-        self.config = Config(str(self.selected_model))
+        self.config = Config(f'lib.models.{str(self.selected_model)}')
         self.config.set_content(Image.open(self.content_image_path))
         self.config.set_style(Image.open(self.style_image_path))
         self.config.content_weight = float(self.content_weight_entry.get())
@@ -189,7 +188,7 @@ class yoloUI:
     def updateStyleImage(self, newPath):
         self.style_image_path = newPath
         self.style_image = Image.open(self.style_image_path)
-        self.style_image = self.style_image.resize((500,500))
+        self.style_image = self.style_image.resize((500, 500))
         self.style_image = ImageTk.PhotoImage(self.style_image)
         self.cStyle.create_image(0, 0, anchor=NW, image=self.style_image)
 
