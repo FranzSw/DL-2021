@@ -4,7 +4,7 @@ from ..evaluator import Evaluator as BaseEvaluator
 
 
 class Evaluator(BaseEvaluator):
-    dimensions = (512, 512)
+    dimensions = (224, 224)
     style_layers = ['conv2_block2_1_bn', 'conv3_block1_0_bn',
                     'conv3_block1_3_conv', 'conv4_block5_2_bn']
     content_layers = ['conv1_conv']
