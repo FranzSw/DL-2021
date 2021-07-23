@@ -99,7 +99,7 @@ class Evaluator(object):
         return loss
 
     def total_variation_loss(self):
-        return self.total_variation_weight * total_variation_loss(self.combination_image, self.dimensions)
+        return self.total_variation_weight * total_variation_loss(self.combination_image)
 
     def eval_loss_and_grads(self, x):
         x = x.reshape((1, self.dimensions[0], self.dimensions[1], 3))

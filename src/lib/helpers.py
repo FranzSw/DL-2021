@@ -21,11 +21,9 @@ def style_loss(style, combination, dimensions):
     return backend.sum(backend.square(S - C)) / (4. * (channels ** 2) * (size ** 2))
 
 
-def total_variation_loss(x, dimensions):
-    a = backend.square(x[:, :dimensions[1]-1, :dimensions[0] -
-                       1, :] - x[:, 1:, :dimensions[0]-1, :])
-    b = backend.square(x[:, :dimensions[1]-1, :dimensions[0] -
-                       1, :] - x[:, :dimensions[1]-1, 1:, :])
+def total_variation_loss(x):
+    a = backend.square(x[:, :-1, :-1, :] - x[:, 1:, :-1, :])
+    b = backend.square(x[:, :-1, :-1, :] - x[:, :-1, 1:, :])
     return backend.sum(backend.pow(a + b, 1.25))
 
 
