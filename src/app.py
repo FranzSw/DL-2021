@@ -18,7 +18,7 @@ class yoloUI:
         self.cap = cv2.VideoCapture(0)
         self.root = Tk()
         self.selected_model = ""
-        self.config = None
+        self.config = Config('vgg16')
 
         self.initializeRoot()
         self.initializeVideoCap()
